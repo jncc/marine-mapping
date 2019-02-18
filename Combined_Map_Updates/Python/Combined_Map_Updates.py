@@ -134,11 +134,6 @@ arcpy.AddField_management("Insert target feature here", "Insert field name here"
 #  	     This can be done manually if you want just by selecting by EUNIS values and batch-filling with the relevant
 #  	     level 3 value. Alternatively, this can be automated using the body of code below developed by G. Duncan (2016).
 
-
-##########################
-# [THIS SECTION IS WRITTEN IN ARCPY AND CAN ONLY BE EXECUTED FROM ESRI ArcGIS PYTHON CONSOLE]
-##########################
-
 # Use formula "eunisToAllLevel3(!HAB_TYPE!)" in field calculator (Python of course) with the below as the code block.
 # Warning: This will only pull out TRUE eunis habitats from the input field.
 #          Therefore, any places where the input is a non-eunis value (e.g.
@@ -504,6 +499,10 @@ Control_DF.columns = ['NewGUI', 'ExistingGUI']
 # 3.4. Importing confidence metadata (3-step and MESH) / incl. metadata checks
 #      This information will be used to build the means for comparing new maps against existing data
 
+##########################
+# [THIS SECTION IS WRITTEN IN PYTHON 3.6. AND CAN BE EXECUTED FROM ANY PYTHON CONSOLE / IDE]
+##########################
+
 # 3.4.1. Load data from UK_METADATA_&_CONFIDENCE_2012_HOCI_additions spreadsheet
 UK_Meta_Confidence = pd.read_excel("Z:\\Marine\\Evidence\\HabitatMapping\\EUNISmapping\\UK_METADATA_&_CONFIDENCE_2012_HOCI_additions.xls", "Confidence scores")
 
@@ -650,6 +649,10 @@ else:
 
 # 3.5. Creating metadata for all new survey maps to be added into the combined map
 
+##########################
+# [THIS SECTION IS WRITTEN IN PYTHON 3.6. AND CAN BE EXECUTED FROM ANY PYTHON CONSOLE / IDE]
+##########################
+
 # 3.5.1. Import all attribute data from the newly merged maps into a Pandas DataFrame
 Merged_Attributes = pd.read_csv(
     r'J:\GISprojects\Marine\HabitatMapping\Combined_Map_Updates_LM\InputData\New_Merged_Maps_Attributes_30012019.csv',
@@ -739,6 +742,10 @@ New_Decision_Attributes = New_Decision_Attributes.drop_duplicates(subset=['GUI']
 
 # 3.6. Creating metadata for the intersected existing maps
 
+##########################
+# [THIS SECTION IS WRITTEN IN PYTHON 3.6. AND CAN BE EXECUTED FROM ANY PYTHON CONSOLE / IDE]
+##########################
+
 # 3.6.1. Pull out all combined map GUIs which have an intersecting reference map
 Combined_GUI = pd.DataFrame(Intersected_Maps['CombinedMap_GUI'])
 
@@ -800,6 +807,10 @@ Combined_Decision_Attributes = Combined_Decision_Attributes.drop_duplicates(subs
 ########################################################################################################################
 
 # 3.7. Run the 5 stage decision tree analysis on the existing and new maps - comparing new and existing data
+
+##########################
+# [THIS SECTION IS WRITTEN IN PYTHON 3.6. AND CAN BE EXECUTED FROM ANY PYTHON CONSOLE / IDE]
+##########################
 
 # 3.7.1. Creating the comparison data set
 Comparison_DF = Control_DF
@@ -990,9 +1001,14 @@ Comparison_DF.to_csv(r'J:\GISprojects\Marine\HabitatMapping\Combined_Map_Updates
 #    Perform QC check to identify if any data have been flagged as requiring expert judgement
 #    Pull out erroneous data which requires expert judgement into separate DF
 Requires_Judgement = Comparison_DF.loc[Comparison_DF['Comparison_Result'].isin(['Requires expert judgement'])]
+
 ########################################################################################################################
 
 # 3.8. Joining decision results to geospatial data
+
+##########################
+# [THIS SECTION IS WRITTEN IN PYTHON 3.6. AND CAN BE EXECUTED FROM ANY PYTHON CONSOLE / IDE]
+##########################
 
 #      Loading the comparison results into a format to be attached to the new survey data / combined map intersection
 #      This information must be added as a table and then exported to the working geodatabase as a .dbf format file.
@@ -1003,6 +1019,11 @@ Join_Results = Comparison_DF[['NewGUI', 'ExistingGUI', 'Comparison_Result']]
 
 #      Export Join_Results DF as a .csv file to be joined onto the intersected layer within ArcGIS as a .dbf
 Join_Results.to_csv(r'J:\GISprojects\Marine\HabitatMapping\Combined_Map_Updates_LM\NewCombinedMap_ComparisonOutput\Join_Results.csv', sep=',')
+
+
+##########################
+# [THIS SECTION IS WRITTEN IN ARCPY AND CAN ONLY BE EXECUTED FROM ESRI ArcGIS PYTHON CONSOLE]
+##########################
 
 #      Join the Join_Results table by attributes to the intersected new survey maps / combined map layer
 #      This must be completed for both old and new GUI values to either respective data entry within the intersect layer
@@ -1019,6 +1040,10 @@ arcpy.Erase_analysis("new_maps_dissolved_24012019", "Survey_comb_intersection_ne
 ########################################################################################################################
 
 # 3.9. Readying the intersected new survey / combined map data for overwriting
+
+##########################
+# [THIS SECTION IS WRITTEN IN ARCPY AND CAN ONLY BE EXECUTED FROM ESRI ArcGIS PYTHON CONSOLE]
+##########################
 
 #      Re-select by attributes all the combined map areas (updated with UKSM18) which exclude NE Evidence Base data.
 #      The previous iteration of this also removed UKSM data, whereas, we now wish to retain that information.
