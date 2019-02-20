@@ -47,11 +47,13 @@
 
 # Initial setup and setting of arcpy workspace
 
-# Import all Python libraries required within ArcPy
+# Import all Python libraries required within ArcPy - IMPORT ALL FOR USE WITHIN ArcGIS
 import arcpy
 from arcpy import env
+import re
 
-# Import all Python libraries required for IDE execution
+
+# Import all Python libraries required for IDE execution - IMPORT ALL FOR USE WITHIN IDE
 import os
 import pandas as pd
 import ast
@@ -142,8 +144,6 @@ arcpy.AddField_management("Insert target feature here", "Insert field name here"
 # Therefore:
 # POST-SCRIPT-RUN - check for all "Void" values in the output field to test if
 #                  they can be manually attributed a level 3 or 2 habitat.
-
-import re
 
 # Suggest keeping at False to standardise the concatenation, but can change to True to use the function below.
 # If set "y", uses the first matching concatenator in original hab_type field
@@ -525,6 +525,21 @@ def confidence_check(df):
         return 'Requires 3-Step confidence'
 
 
+#        Define MESH_confidence_check() function to check if the data are missing MESH confidence scores
+def MESH_confidence_check(df):
+    """
+    Function title: confidence_check()
+    Define function to check if a 3-step confidence score has been completed for each GUI within the
+    attribute table
+    """
+    data = df['Overall score']
+    # Perform check calculate if a MESH score is present or lacking
+    if data >= 0:
+        return 'MESH confidence present'
+    else:
+        return 'Requires MESH confidence'
+
+
 # 3.4.2. Metadata Check 1 - Are there any missing 3-step confidence scores?
 #        This score has the greatest weighting in influencing the final outcome
 
@@ -637,6 +652,29 @@ if UK_Meta_Conf_2012HOCI_Missing_GUI_Unique.empty is False:
     UK_Meta_Conf_2012HOCI_Missing_GUI_Unique.\
         to_csv(r'J:\GISprojects\Marine\HabitatMapping\Combined_Map_Updates_LM\InputData\UKMetaConf2012HOCI_MissingData\NotIn_UKMetaConf2012.csv',
                sep=',')
+else:
+    print('No erroneous data present')
+
+
+# 3.4.5. Metadata Check 4 - Are MESH confidence scores present within the
+#        UK_METADATA_&_CONFIDENCE_2012_HOCI_additions.xls document
+
+##########################
+#    METADATA CHECK 4
+##########################
+
+#        Perform check to register if any MESH scores are recorded as 0
+Zero_MESH_Confidence = JNCC_Missing_Confidence.loc[JNCC_Missing_Confidence['Overall score'] == 0]
+
+#        Export the data which have been registered as potentially erroneous with a MESH score of 0
+if Zero_MESH_Confidence.empty is False:
+    # Print this data if there are entries within the DF
+    print(Zero_MESH_Confidence)
+    # Export this data to a .csv file if there are entries within the DF
+    Zero_MESH_Confidence.\
+        to_csv(
+        r'J:\GISprojects\Marine\HabitatMapping\Combined_Map_Updates_LM\InputData\UKMetaConf2012HOCI_MissingData\Zero_MESH_Confidence.csv',
+         sep=',')
 else:
     print('No erroneous data present')
 
